@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 from .models import Category, Post
 from .forms import PostForm
+from django.core.paginator import Paginator
 
 
 User = get_user_model()
@@ -17,8 +18,11 @@ def index(request):
         is_published=True,
         category__is_published=True,
         pub_date__lte=now()
-    ).order_by('-pub_date')[:5]
-    context = {'post_list': post_list}
+    ).order_by('-pub_date')
+    paginator = Paginator(post_list, 10)  # 10 публикаций на странице
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'page_obj': page_obj}
     return render(request, template, context)
 
 
@@ -48,7 +52,10 @@ def category_posts(request, category_slug):
         is_published=True,
         pub_date__lte=now()
     ).order_by('-pub_date')
-    context = {'category': category, 'post_list': post_list}
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'category': category, 'page_obj': page_obj}
     return render(request, template, context)
 
 
@@ -99,9 +106,12 @@ def profile(request, username):
         is_published=True,
         pub_date__lte=now()
     ).order_by('-pub_date')
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
         'profile': user,
-        'post_list': post_list,
+        'page_obj': page_obj,
     }
     return render(request, template, context)
 
