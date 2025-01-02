@@ -1,7 +1,14 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth import get_user_model
 from django.utils.timezone import now
+from django.urls import reverse
 from django.db.models import Q
 from .models import Category, Post
+from .forms import PostForm
+
+
+User = get_user_model()
 
 
 def index(request):
@@ -42,4 +49,71 @@ def category_posts(request, category_slug):
         pub_date__lte=now()
     ).order_by('-pub_date')
     context = {'category': category, 'post_list': post_list}
+    return render(request, template, context)
+
+
+def create_post(request):
+    template = 'blog/create.html'
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('blog:index')
+    else:
+        form = PostForm()
+    context = {'form': form}
+    return render(request, template, context)
+
+
+def edit_post(request, id):
+    template = 'blog/create.html'
+    post = get_object_or_404(Post, id=id, author=request.user)
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:post_detail', id=id)
+    else:
+        form = PostForm(instance=post)
+    context = {'form': form}
+    return render(request, template, context)
+
+
+def delete_post(request, id):
+    template = 'blog/create.html'
+    post = get_object_or_404(Post, id=id, author=request.user)
+    if request.method == 'POST':
+        post.delete()
+        return redirect('blog:index')
+    context = {'form': PostForm(instance=post)}
+    return render(request, template, context)
+
+
+def profile(request, username):
+    template = 'blog/profile.html'
+    user = get_object_or_404(User, username=username)
+    post_list = Post.objects.filter(
+        author=user,
+        is_published=True,
+        pub_date__lte=now()
+    ).order_by('-pub_date')
+    context = {
+        'profile': user,
+        'post_list': post_list,
+    }
+    return render(request, template, context)
+
+
+def edit_profile(request):
+    template = 'blog/user.html'
+    if request.method == 'POST':
+        form = UserChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:profile', username=request.user.username)
+    else:
+        form = UserChangeForm(instance=request.user)
+    context = {'form': form}
     return render(request, template, context)
