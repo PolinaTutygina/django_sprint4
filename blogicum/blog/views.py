@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from django.urls import reverse
@@ -150,6 +151,7 @@ def edit_profile(request):
     return render(request, template, context)
 
 
+@login_required
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id, is_published=True)
     if request.method == 'POST':
