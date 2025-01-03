@@ -32,7 +32,7 @@ def post_detail(request, post_id):
     template = 'blog/detail.html'
     exclusion_condition = (
         Q(pub_date__gt=now())
-        | Q(is_published=False)
+        | Q(is_published=False, author__ne=request.user)
         | Q(category__is_published=False)
     )
     post = get_object_or_404(
