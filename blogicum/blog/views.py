@@ -174,6 +174,7 @@ def add_comment(request, post_id):
 
 @login_required
 def edit_comment(request, post_id, comment_id):
+    template = 'blog/comment.html'
     comment = get_object_or_404(Comment, id=comment_id, author=request.user)
     if request.method == 'POST':
         form = CommentForm(request.POST, instance=comment)
@@ -187,15 +188,15 @@ def edit_comment(request, post_id, comment_id):
         'comment': comment,
         'post_id': post_id,
     }
-    return render(request, 'blog/comment.html', context)
+    return render(request, template, context)
 
 
 @login_required
 def delete_comment(request, post_id, comment_id):
-    template = 'blog/create.html'
+    template = 'blog/comment.html'
     comment = get_object_or_404(Comment, id=comment_id, author=request.user)
     if request.method == 'POST':
         comment.delete()
         return redirect('blog:post_detail', post_id=post_id)
-    context = {'form': CommentForm(instance=comment)}
+    context = {'comment': comment}
     return render(request, template, context)
