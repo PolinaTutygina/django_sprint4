@@ -19,7 +19,7 @@ def index(request):
         is_published=True,
         category__is_published=True,
         pub_date__lte=now()
-    ).annotate(comments_count=Count('comments')).order_by('-pub_date')
+    ).annotate(comment_count=Count('comments')).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -67,7 +67,7 @@ def category_posts(request, category_slug):
         category=category,
         is_published=True,
         pub_date__lte=now()
-    ).annotate(comments_count=Count('comments')).order_by('-pub_date')
+    ).annotate(comment_count=Count('comments')).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -120,13 +120,13 @@ def profile(request, username):
     if request.user.username == username:
         post_list = Post.objects.filter(
             author=user,
-        ).annotate(comments_count=Count('comments')).order_by('-pub_date')
+        ).annotate(comment_count=Count('comments')).order_by('-pub_date')
     else:
         post_list = Post.objects.filter(
             author=user,
             is_published=True,
             pub_date__lte=now()
-        ).annotate(comments_count=Count('comments')).order_by('-pub_date')
+        ).annotate(comment_count=Count('comments')).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
