@@ -98,7 +98,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
     )
     text = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField('Добавлено', auto_now_add=True)
 
     class Meta:
         ordering = ('created',)

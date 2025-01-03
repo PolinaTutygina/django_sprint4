@@ -30,13 +30,14 @@ def index(request):
 
 def post_detail(request, post_id):
     template = 'blog/detail.html'
-    exclusion_condition = (
-        Q(pub_date__gt=now())
-        | Q(is_published=False, author__ne=request.user)
-        | Q(category__is_published=False)
-    )
     post = get_object_or_404(
-        Post.objects.exclude(exclusion_condition),
+        Post.objects.filter(
+            Q(is_published=True) | Q(author=request.user)
+        ).filter(
+            Q(pub_date__lte=now()) | Q(author=request.user)
+        ).filter(
+            Q(category__is_published=True) | Q(author=request.user)
+        ),
         pk=post_id
     )
     if request.method == 'POST':
