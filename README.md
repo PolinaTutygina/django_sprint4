@@ -1,7 +1,5 @@
 # django_sprint4
 
-# Blogicum
-
 Cоздать и активировать виртуальное окружение:
 
 Windows
