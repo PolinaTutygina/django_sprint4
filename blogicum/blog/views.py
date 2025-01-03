@@ -76,6 +76,7 @@ def category_posts(request, category_slug):
     return render(request, template, context)
 
 
+@login_required
 def create_post(request):
     template = 'blog/create.html'
     if request.method == 'POST':
@@ -91,9 +92,12 @@ def create_post(request):
     return render(request, template, context)
 
 
+@login_required
 def edit_post(request, post_id):
     template = 'blog/create.html'
-    post = get_object_or_404(Post, id=post_id, author=request.user)
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return redirect('blog:post_detail', post_id=post_id)
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
@@ -105,6 +109,7 @@ def edit_post(request, post_id):
     return render(request, template, context)
 
 
+@login_required
 def delete_post(request, post_id):
     template = 'blog/create.html'
     post = get_object_or_404(Post, id=post_id, author=request.user)
@@ -138,6 +143,7 @@ def profile(request, username):
     return render(request, template, context)
 
 
+@login_required
 def edit_profile(request):
     template = 'blog/user.html'
     if request.method == 'POST':
@@ -165,6 +171,7 @@ def add_comment(request, post_id):
     return redirect('blog:post_detail', post_id=post_id)
 
 
+@login_required
 def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id, author=request.user)
     if request.method == 'POST':
@@ -182,6 +189,7 @@ def edit_comment(request, post_id, comment_id):
     return render(request, 'blog/comment.html', context)
 
 
+@login_required
 def delete_comment(request, post_id, comment_id):
     template = 'blog/create.html'
     comment = get_object_or_404(Comment, id=comment_id, author=request.user)
