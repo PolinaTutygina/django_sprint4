@@ -3,7 +3,6 @@ from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
-from django.urls import reverse
 from django.db.models import Q
 from .models import Category, Post, Comment
 from .forms import PostForm, CommentForm
