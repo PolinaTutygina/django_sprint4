@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -51,13 +51,7 @@ class Location(models.Model):
 class Post(models.Model):
     title = models.CharField('Заголовок', max_length=256)
     text = models.TextField('Текст')
-    pub_date = models.DateTimeField(
-        'Дата и время публикации',
-        help_text=(
-            'Если установить дату и время в будущем — '
-            'можно делать отложенные публикации.'
-        )
-    )
+    pub_date = models.DateTimeField('Дата и время публикации',)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -82,7 +76,7 @@ class Post(models.Model):
         help_text='Снимите галочку, чтобы скрыть публикацию.'
     )
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
-    image = models.ImageField('Фото', upload_to='posts', blank=True)
+    image = models.ImageField('Фото', upload_to='posts', blank=True, null=True)
 
     class Meta:
         verbose_name = 'публикация'
@@ -90,3 +84,23 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('created',)
+
+    def __str__(self):
+        return self.text[:50]

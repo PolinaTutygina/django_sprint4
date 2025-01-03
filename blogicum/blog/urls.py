@@ -12,6 +12,8 @@ urlpatterns = [
     path('create/', views.create_post, name='create_post'),
     path('posts/<int:id>/edit/', views.edit_post, name='edit_post'),
     path('posts/<int:id>/delete/', views.delete_post, name='delete_post'),
+    path('posts/<int:post_id>/comment/', views.add_comment, name='add_comment'),
+    path('posts/<int:post_id>/edit_comment/<int:comment_id>/', views.edit_comment, name='edit_comment'),
     path('profile/password/', 
          auth_views.PasswordChangeView.as_view(template_name='registration/password_change_form.html'), 
          name='change_password'),

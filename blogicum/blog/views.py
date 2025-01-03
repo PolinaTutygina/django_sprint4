@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from django.utils.timezone import now
 from django.urls import reverse
 from django.db.models import Q
-from .models import Category, Post
-from .forms import PostForm
+from .models import Category, Post, Comment
+from .forms import PostForm, CommentForm
 from django.core.paginator import Paginator
 
 
@@ -37,7 +37,22 @@ def post_detail(request, id):
         Post.objects.exclude(exclusion_condition),
         pk=id
     )
-    context = {'post': post}
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('blog:post_detail', id=id)
+    else:
+        form = CommentForm()
+    comments = post.comments.all()
+    context = {
+        'post': post,
+        'form': form,
+        'comments': comments,
+    }
     return render(request, template, context)
 
 
@@ -130,3 +145,28 @@ def edit_profile(request):
         form = UserChangeForm(instance=request.user)
     context = {'form': form}
     return render(request, template, context)
+
+
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id, is_published=True)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('blog:post_detail', id=post_id)
+    return redirect('blog:post_detail', id=post_id)
+
+
+def edit_comment(request, post_id, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:post_detail', id=post_id)
+    else:
+        form = CommentForm(instance=comment)
+    return render(request, 'blog/comment.html', {'form': form})
