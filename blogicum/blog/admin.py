@@ -5,6 +5,14 @@ from .models import Location
 from .models import Post
 
 
-admin.site.register(Category)
-admin.site.register(Location)
+class CategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+class LocationAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Location, LocationAdmin)
 admin.site.register(Post)

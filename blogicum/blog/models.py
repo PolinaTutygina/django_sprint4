@@ -45,7 +45,7 @@ class Location(models.Model):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Post(models.Model):
@@ -82,6 +82,7 @@ class Post(models.Model):
         help_text='Снимите галочку, чтобы скрыть публикацию.'
     )
     created_at = models.DateTimeField('Добавлено', auto_now_add=True)
+    image = models.ImageField('Фото', upload_to='posts', blank=True)
 
     class Meta:
         verbose_name = 'публикация'

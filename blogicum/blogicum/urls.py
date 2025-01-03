@@ -14,8 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.conf import settings
 from django.urls import include, path, reverse_lazy
-
+from django.conf.urls.static import static
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 
@@ -34,7 +35,7 @@ urlpatterns = [
         ),
         name='registration',
     ),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = 'pages.views.page_not_found'
 handler500 = 'pages.views.server_error'

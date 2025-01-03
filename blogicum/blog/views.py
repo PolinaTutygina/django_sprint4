@@ -19,7 +19,7 @@ def index(request):
         category__is_published=True,
         pub_date__lte=now()
     ).order_by('-pub_date')
-    paginator = Paginator(post_list, 10)  # 10 публикаций на странице
+    paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {'page_obj': page_obj}
@@ -67,7 +67,7 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            return redirect('blog:index')
+            return redirect('blog:profile', username=request.user.username)
     else:
         form = PostForm()
     context = {'form': form}
@@ -101,11 +101,14 @@ def delete_post(request, id):
 def profile(request, username):
     template = 'blog/profile.html'
     user = get_object_or_404(User, username=username)
-    post_list = Post.objects.filter(
-        author=user,
-        is_published=True,
-        pub_date__lte=now()
-    ).order_by('-pub_date')
+    if request.user.username == username:
+        post_list = Post.objects.filter(author=user).order_by('-pub_date')
+    else:
+        post_list = Post.objects.filter(
+            author=user,
+            is_published=True,
+            pub_date__lte=now()
+        ).order_by('-pub_date')
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
